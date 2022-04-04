@@ -1,0 +1,100 @@
+
+const int sensorPin = 3;
+const int ledPin = 2;
+const int switchButton = 0;
+
+//threshold for switching light value
+const int sensitivity = 5;
+
+//for calibration
+int lightCal;
+int lightVal;
+
+//switch on/off
+int switchState;
+
+// to allow use of the original delay function
+unsigned int totalDelays = 0; 
+
+//for timer
+const int timeInDay = 700;
+const int delayAmount = 5;
+const int onTime = 500;
+const int offTime = timeInDay-onTime;
+bool timerSaysOn;
+
+void setup() {
+  //init serial communication @ 9600 bits/s
+//  Serial.begin(9600);
+ 
+  //Output: LED pin
+  pinMode(ledPin, OUTPUT);
+
+  //Input: switch
+  pinMode(switchButton, INPUT);
+
+  //lightCal: INITIAL sensor value
+  lightCal = analogRead(sensorPin);
+
+//  pinMode (10, OUTPUT);
+//  digitalWrite(10, LOW);
+
+  pinMode (1, OUTPUT);
+  digitalWrite(1, HIGH);
+}
+
+void loop() {
+  //read sensor value and store in lightVal
+  lightVal = analogRead(sensorPin);
+
+  //switch reading
+  switchState = digitalRead(switchButton);
+//  Serial.println("switch state: " + (String)switchState);
+
+  if (switchState == 1){
+    lightSensorSequence();
+  }
+  else {
+    timerSequence();
+  }
+
+//  delays();
+ 
+}
+
+//controls on/off of the lights with the photoresistor values
+void lightSensorSequence(){
+  if (lightVal < lightCal - sensitivity){
+    //error print
+//    Serial.println("light off");
+    digitalWrite(ledPin, LOW);
+  }
+  else {
+    //error print
+//    Serial.println("light ON.");
+    digitalWrite(ledPin, HIGH);
+  }
+}
+
+//controls on/off of the lights with a timer
+void timerSequence(){ 
+unsigned long long millisTime = millis() + totalDelays;
+unsigned long seconds = (int) millisTime/60;
+unsigned long mins = (int) seconds/60;
+unsigned long hours = (int) seconds/60;
+
+int time = hours % 24;
+
+  if (hours <=8){
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+  
+}
+
+void delays(){
+  delay(delayAmount);
+  totalDelays += delayAmount;
+}
+
